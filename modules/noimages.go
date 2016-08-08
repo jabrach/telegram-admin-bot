@@ -7,10 +7,7 @@ import (
 )
 
 func NoImages(msg *cli.Message, wrapper cli.CLI) {
-	if msg.Event != "message" || msg.Media == nil {
-		return
-	}
-	if msg.To.PeerType != "chat" || msg.To.PeerID != config.GroupID() {
+	if !filter(msg, IsMessage, FromManagedGroup, WithMedia) {
 		return
 	}
 	if !config.NoImages(msg.From.PeerID) {

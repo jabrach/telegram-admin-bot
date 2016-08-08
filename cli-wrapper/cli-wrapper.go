@@ -39,6 +39,8 @@ func (w *wrapper) Listen() {
 	w.setupPipes()
 
 	go w.listeningRoutine()
+
+	log.Println("Listening...")
 	w.Cmd.Start()
 	w.Cmd.Wait()
 }
