@@ -2,6 +2,7 @@ package cli
 
 import (
 	"bufio"
+	"bytes"
 	"encoding/json"
 	"github.com/sthetz/tetanus/config"
 	"io"
@@ -10,7 +11,7 @@ import (
 	"strings"
 )
 
-var args = []string{
+var cmdArgs = []string{
 	"--permanent-msg-ids",
 	"--permanent-peer-ids",
 	"--json",
@@ -26,17 +27,36 @@ type CLI interface {
 type wrapper struct {
 	Cmd      *exec.Cmd
 	handlers []handlerFunc
+	Self     *Self
 	stdout   *bufio.Reader
 	stdin    io.WriteCloser
 	exeCh    chan string
 }
 
 func New() CLI {
-	return &wrapper{}
+	w := &wrapper{}
+	w.loadSelf()
+
+	return w
+}
+
+func (w *wrapper) loadSelf() {
+	cmd := exec.Command(config.BinPath(), append(cmdArgs, "-e get_self", "-D")...)
+	out, err := cmd.Output()
+	if err != nil {
+		panic(err)
+	}
+	lines := bytes.Split(out, []byte{'\n'})
+	w.Self = &Self{}
+
+	if err := json.Unmarshal(lines[0], w.Self); err != nil {
+		panic(err)
+	}
+	log.Printf("Using account \"%s\" (ID %s)", w.Self.Username, w.Self.ID)
 }
 
 func (w *wrapper) Listen() {
-	w.Cmd = exec.Command(config.BinPath(), args...)
+	w.Cmd = exec.Command(config.BinPath(), cmdArgs...)
 	w.setupPipes()
 
 	go w.listeningRoutine()

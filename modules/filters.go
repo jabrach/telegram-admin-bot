@@ -11,8 +11,29 @@ func IsMessage(msg *cli.Message) bool {
 	return msg.Event == "message"
 }
 
+func IsUpdate(msg *cli.Message) bool {
+	return msg.Event == "updates"
+}
+
+func IsTitleUpdate(msg *cli.Message) bool {
+	for _, upd := range msg.Updates {
+		if upd == "title" {
+			return true
+		}
+	}
+	return false
+}
+
 func FromManagedGroup(msg *cli.Message) bool {
-	return msg.To.PeerType == "chat" && msg.To.PeerID == config.GroupID()
+	chat := msg.To
+	if chat == nil {
+		chat = msg.Peer
+	}
+	if chat == nil {
+		return false
+	}
+
+	return chat.PeerType == "chat" && chat.PeerID == config.GroupID()
 }
 
 func WithMedia(msg *cli.Message) bool {

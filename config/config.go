@@ -7,9 +7,10 @@ import (
 )
 
 var userConfig = struct {
-	BinPath  string `json:"telegram_cli_path"`
-	GroupID  int    `json:"group_id"`
-	NoImages []int  `json:"no_images"`
+	BinPath   string `json:"telegram_cli_path"`
+	GroupID   int    `json:"group_id"`
+	NoImages  []int  `json:"no_images"`
+	GroupName string `json:"group_name"`
 }{}
 
 func Load(path string) error {
@@ -22,6 +23,10 @@ func Load(path string) error {
 	}
 
 	return nil
+}
+
+func GroupName() string {
+	return userConfig.GroupName
 }
 
 func GroupID() int {
