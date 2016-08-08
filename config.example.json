@@ -1,8 +1,8 @@
 {
-  "api_token": "...",
-  "group_id": 14881488,
+  "group_id": 1488,
+  "telegram_cli_path": "/Users/sthetz/code/tg/bin/telegram-cli",
 
   "no_images": [
-    31337
+    1337
   ]
 }

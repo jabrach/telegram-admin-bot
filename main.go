@@ -3,11 +3,10 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/sthetz/tetanus/botapi"
+	"github.com/sthetz/tetanus/cli-wrapper"
 	"github.com/sthetz/tetanus/config"
+	"github.com/sthetz/tetanus/modules"
 )
-
-const BotName = "Tetanus"
 
 func main() {
 	var configPath = flag.String("C", "", "Path to config")
@@ -21,6 +20,7 @@ func main() {
 		panic(err)
 	}
 
-	bot := botapi.New(config.APItoken())
-	bot.Listen()
+	wrapper := cli.New()
+	wrapper.AddHandler(modules.NoImages)
+	wrapper.Listen()
 }

@@ -7,8 +7,8 @@ import (
 )
 
 var userConfig = struct {
-	APItoken string `json:"api_token"`
-	GroupID  int64  `json:"group_id"`
+	BinPath  string `json:"telegram_cli_path"`
+	GroupID  int    `json:"group_id"`
 	NoImages []int  `json:"no_images"`
 }{}
 
@@ -24,12 +24,12 @@ func Load(path string) error {
 	return nil
 }
 
-func APItoken() string {
-	return userConfig.APItoken
+func GroupID() int {
+	return userConfig.GroupID
 }
 
-func GroupID() int64 {
-	return userConfig.GroupID
+func BinPath() string {
+	return userConfig.BinPath
 }
 
 func NoImages(id int) bool {
