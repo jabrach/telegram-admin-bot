@@ -28,6 +28,7 @@ type wrapper struct {
 	handlers []handlerFunc
 	stdout   *bufio.Reader
 	stdin    io.WriteCloser
+	exeCh    chan string
 }
 
 func New() CLI {
@@ -39,6 +40,7 @@ func (w *wrapper) Listen() {
 	w.setupPipes()
 
 	go w.listeningRoutine()
+	go w.execRoutine()
 
 	log.Println("Listening...")
 	w.Cmd.Start()
@@ -46,16 +48,8 @@ func (w *wrapper) Listen() {
 }
 
 func (w *wrapper) Exec(cmd string, args ...string) {
-	scmd := append([]string{cmd}, args...)
-	bcmd := []byte(strings.Join(scmd, " "))
-	bcmd = append(bcmd, '\n')
-
-	log.Printf("Sending command: %s", bcmd)
-
-	_, err := w.stdin.Write(bcmd)
-	if err != nil {
-		panic(err)
-	}
+	scmd := strings.Join(append([]string{cmd}, args...), " ")
+	w.exeCh <- scmd
 }
 
 func (w *wrapper) AddHandler(handler handlerFunc) {
@@ -76,6 +70,7 @@ func (w *wrapper) setupPipes() {
 		panic(err)
 	}
 	w.stdin = in
+	w.exeCh = make(chan string)
 }
 
 func (w *wrapper) listeningRoutine() {
@@ -85,6 +80,18 @@ func (w *wrapper) listeningRoutine() {
 			panic(err)
 		}
 		go w.handleMessage(line)
+	}
+}
+
+func (w *wrapper) execRoutine() {
+	for cmd := range w.exeCh {
+		bcmd := append([]byte(cmd), '\n')
+		log.Printf("Sending command: %s", bcmd)
+
+		_, err := w.stdin.Write(bcmd)
+		if err != nil {
+			panic(err)
+		}
 	}
 }
 
