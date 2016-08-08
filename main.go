@@ -8,6 +8,9 @@ import (
 	"github.com/sthetz/tetanus/modules"
 )
 
+// 171773961 j
+// 122081242 s
+
 func main() {
 	var configPath = flag.String("C", "", "Path to config")
 	flag.Parse()
@@ -24,5 +27,6 @@ func main() {
 	wrapper.AddHandler(modules.NoImages)
 	wrapper.AddHandler(modules.Topic.Set)
 	wrapper.AddHandler(modules.Topic.Guard)
+	wrapper.AddHandler(modules.PicUpdater.Update)
 	wrapper.Listen()
 }
