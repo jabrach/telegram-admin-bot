@@ -24,6 +24,8 @@ func main() {
 	}
 
 	wrapper := cli.New()
+	defer wrapper.Stop()
+
 	wrapper.AddHandler(modules.NoImages)
 	wrapper.AddHandler(modules.Topic.Set)
 	wrapper.AddHandler(modules.Topic.Guard)

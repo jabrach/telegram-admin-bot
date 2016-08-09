@@ -20,6 +20,7 @@ var cmdArgs = []string{
 
 type CLI interface {
 	Listen()
+	Stop()
 	Exec(string, ...string)
 	AddHandler(handlerFunc)
 }
@@ -65,6 +66,10 @@ func (w *wrapper) Listen() {
 	log.Println("Listening...")
 	w.Cmd.Start()
 	w.Cmd.Wait()
+}
+
+func (w *wrapper) Stop() {
+	w.Cmd.Process.Kill()
 }
 
 func (w *wrapper) Exec(cmd string, args ...string) {
