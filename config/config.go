@@ -6,11 +6,10 @@ import (
 	"io/ioutil"
 )
 
-var userConfig = struct {
-	BinPath   string  `json:"telegram_cli_path"`
-	GroupID   int64   `json:"group_id"`
-	NoImages  []int64 `json:"no_images"`
-	GroupName string  `json:"group_name"`
+var cnf = struct {
+	BinPath       string   `json:"telegram_cli_path"`
+	ManagedGroups []jGroup `json:"managed_groups"`
+	MGroupsMap    map[int64]*Group
 }{}
 
 func Load(path string) error {
@@ -18,30 +17,22 @@ func Load(path string) error {
 	if err != nil {
 		return fmt.Errorf("Unable to read config file: %v", err.Error())
 	}
-	if err := json.Unmarshal(data, &userConfig); err != nil {
+	if err := json.Unmarshal(data, &cnf); err != nil {
 		return fmt.Errorf("Malformed JSON in config: %v", err.Error())
+	}
+
+	cnf.MGroupsMap = map[int64]*Group{}
+	for _, group := range cnf.ManagedGroups {
+		cnf.MGroupsMap[group.ID] = group.Init()
 	}
 
 	return nil
 }
 
-func GroupName() string {
-	return userConfig.GroupName
-}
-
-func GroupID() int64 {
-	return userConfig.GroupID
+func ManagedGroup(id int64) *Group {
+	return cnf.MGroupsMap[id]
 }
 
 func BinPath() string {
-	return userConfig.BinPath
-}
-
-func NoImages(id int64) bool {
-	for _, muted := range userConfig.NoImages {
-		if id == muted {
-			return true
-		}
-	}
-	return false
+	return cnf.BinPath
 }

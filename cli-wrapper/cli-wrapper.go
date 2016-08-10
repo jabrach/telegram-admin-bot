@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"encoding/json"
-	"github.com/sthetz/tetanus/config"
+	"github.com/jabrach/telegram-admin-bot/config"
 	"io"
 	"log"
 	"os/exec"
@@ -122,15 +122,16 @@ func (w *wrapper) execRoutine() {
 
 func (w *wrapper) handleMessage(line string) {
 	if line[0] != '{' {
-		// log.Printf("???: %v\n", line)
 		return
 	}
-	msg := &Message{}
-	if err := json.Unmarshal([]byte(line), msg); err != nil {
+	msg := &Message{Data: MessageData{}}
+	if err := json.Unmarshal([]byte(line), &msg.Data); err != nil {
 		log.Fatalf("Error parsing JSON: %v\n", err.Error())
 		return
 	}
+
 	msg.JSON = line
+	msg.ID = msg.Data.ID
 
 	for _, handler := range w.handlers {
 		handler(msg, w)

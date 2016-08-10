@@ -3,9 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/sthetz/tetanus/cli-wrapper"
-	"github.com/sthetz/tetanus/config"
-	"github.com/sthetz/tetanus/modules"
+	"github.com/jabrach/telegram-admin-bot/cli-wrapper"
+	"github.com/jabrach/telegram-admin-bot/config"
+	"github.com/jabrach/telegram-admin-bot/modules"
 )
 
 // 171773961 j
@@ -26,7 +26,8 @@ func main() {
 	wrapper := cli.New()
 	defer wrapper.Stop()
 
-	wrapper.AddHandler(modules.NoImages)
+	wrapper.AddHandler(modules.Log)
+	wrapper.AddHandler(modules.Mute)
 	wrapper.AddHandler(modules.Topic.Set)
 	wrapper.AddHandler(modules.Topic.Guard)
 	wrapper.AddHandler(modules.PicUpdater.Update)

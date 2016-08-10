@@ -1,8 +1,8 @@
 package modules
 
 import (
-	"github.com/sthetz/tetanus/cli-wrapper"
-	"github.com/sthetz/tetanus/config"
+	"github.com/jabrach/telegram-admin-bot/cli-wrapper"
+	"github.com/jabrach/telegram-admin-bot/config"
 	"log"
 	"strings"
 	"sync"
@@ -10,7 +10,7 @@ import (
 
 type nameGuard struct {
 	sync.Mutex
-	topic string
+	topics map[int64]string
 }
 
 var Topic = nameGuard{}
@@ -19,41 +19,41 @@ func (n *nameGuard) Set(msg *cli.Message, wrapper cli.CLI) {
 	if !filter(msg, IsMessage, FromManagedGroup) {
 		return
 	}
-	text := strings.TrimSpace(msg.Text)
+	text := strings.TrimSpace(msg.Data.Text)
 	if len(text) < 8 || text[0:7] != "/topic " {
 		return
 	}
 	topic := text[7:]
-	log.Printf("Topic change from %s: %s", msg.From.PrintName, topic)
-	n.saveTopic(topic)
-	n.setTopic(msg.To.ID, wrapper)
+	log.Printf("Topic change from %s: %s", msg.Data.From.PrintName, topic)
+	n.saveTopic(msg.Group().ID, topic)
+	n.setTopic(msg.Data.Peer.ID, msg.Group(), wrapper)
 }
 
 func (n *nameGuard) Guard(msg *cli.Message, wrapper cli.CLI) {
 	if !filter(msg, FromManagedGroup, IsUpdate, IsTitleUpdate) {
 		return
 	}
-	if msg.Peer == nil {
+	if msg.Data.Peer == nil {
 		return
 	}
 
-	if msg.Peer.Title != n.fullTopic() {
-		log.Printf("Unwarranted topic change by %v, restoring", msg.Peer.PrintName)
-		n.setTopic(msg.Peer.ID, wrapper)
-		wrapper.Exec("msg", msg.Peer.ID, "Юзайте /topic, ущербы")
+	if msg.Data.Peer.Title != n.fullTopic(msg.Group()) {
+		log.Printf("Unwarranted topic change by %v, restoring", msg.Data.Peer.PrintName)
+		n.setTopic(msg.Data.Peer.ID, msg.Group(), wrapper)
+		wrapper.Exec("msg", msg.Data.Peer.ID, "Юзайте /topic, ущербы")
 	}
 }
 
-func (n *nameGuard) saveTopic(topic string) {
+func (n *nameGuard) saveTopic(groupID int64, topic string) {
 	n.Lock()
 	defer n.Unlock()
-	n.topic = topic
+	n.topics[groupID] = topic
 }
 
-func (n *nameGuard) setTopic(chatID string, wrapper cli.CLI) {
-	wrapper.Exec("rename_chat", chatID, n.fullTopic())
+func (n *nameGuard) setTopic(chatID string, group *config.Group, wrapper cli.CLI) {
+	wrapper.Exec("rename_chat", chatID, n.fullTopic(group))
 }
 
-func (n *nameGuard) fullTopic() string {
-	return (config.GroupName() + ". " + n.topic)
+func (n *nameGuard) fullTopic(group *config.Group) string {
+	return (group.Name + ". " + n.topics[group.ID])
 }

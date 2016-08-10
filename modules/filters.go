@@ -1,22 +1,21 @@
 package modules
 
 import (
-	"github.com/sthetz/tetanus/cli-wrapper"
-	"github.com/sthetz/tetanus/config"
+	"github.com/jabrach/telegram-admin-bot/cli-wrapper"
 )
 
 type filterFunc func(*cli.Message) bool
 
 func IsMessage(msg *cli.Message) bool {
-	return msg.Event == "message"
+	return msg.Data.Event == "message"
 }
 
 func IsUpdate(msg *cli.Message) bool {
-	return msg.Event == "updates"
+	return msg.Data.Event == "updates"
 }
 
 func IsTitleUpdate(msg *cli.Message) bool {
-	for _, upd := range msg.Updates {
+	for _, upd := range msg.Data.Updates {
 		if upd == "title" {
 			return true
 		}
@@ -25,19 +24,11 @@ func IsTitleUpdate(msg *cli.Message) bool {
 }
 
 func FromManagedGroup(msg *cli.Message) bool {
-	chat := msg.To
-	if chat == nil {
-		chat = msg.Peer
-	}
-	if chat == nil {
-		return false
-	}
-
-	return chat.PeerType == "chat" && chat.PeerID == config.GroupID()
+	return msg.Group() != nil
 }
 
 func WithMedia(msg *cli.Message) bool {
-	return msg.Media != nil
+	return msg.Data.Media != nil
 }
 
 func filter(msg *cli.Message, checks ...filterFunc) bool {
