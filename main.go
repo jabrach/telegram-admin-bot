@@ -16,7 +16,7 @@ func main() {
 	flag.Parse()
 
 	if *configPath == "" {
-		fmt.Println("Usage: ./tetanus -C path/to/config.json")
+		fmt.Println("Usage: ./telegram-admin-bot -C path/to/config.json")
 		return
 	}
 	if err := config.Load(*configPath); err != nil {
