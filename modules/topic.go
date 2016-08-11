@@ -26,7 +26,7 @@ func (n *nameGuard) Set(msg *cli.Message, wrapper cli.CLI) {
 	topic := text[7:]
 	log.Printf("Topic change from %s: %s", msg.Data.From.PrintName, topic)
 	n.saveTopic(msg.Group().ID, topic)
-	n.setTopic(msg.Data.Peer.ID, msg.Group(), wrapper)
+	n.setTopic(msg.Data.To.ID, msg.Group(), wrapper)
 }
 
 func (n *nameGuard) Guard(msg *cli.Message, wrapper cli.CLI) {
@@ -47,6 +47,9 @@ func (n *nameGuard) Guard(msg *cli.Message, wrapper cli.CLI) {
 func (n *nameGuard) saveTopic(groupID int64, topic string) {
 	n.Lock()
 	defer n.Unlock()
+	if len(n.topics) == 0 {
+		n.topics = map[int64]string{}
+	}
 	n.topics[groupID] = topic
 }
 
