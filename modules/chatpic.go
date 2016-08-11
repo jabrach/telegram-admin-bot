@@ -43,6 +43,12 @@ func (p *picUpdater) Update(msg *cli.Message, wrapper cli.CLI) {
 	}
 
 	if WithMedia(msg) && msg.Data.Media.Type == "photo" {
+		if strings.TrimSpace(msg.Data.Media.Caption) == "/set_pic" {
+			p.chatID = msg.Data.To.ID
+			wrapper.Exec("load_photo", msg.ID)
+			return
+		}
+
 		if t, ok := p.queues[msg.Data.From.PeerID]; ok {
 			delta := time.Now().Unix() - t
 			log.Printf("Got pic from %s after %v seconds\n", msg.Data.From.PrintName, delta)

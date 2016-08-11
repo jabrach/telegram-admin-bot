@@ -26,7 +26,7 @@ func main() {
 	wrapper := cli.New()
 	defer wrapper.Stop()
 
-	wrapper.AddHandler(modules.Log)
+	// wrapper.AddHandler(modules.Log)
 	wrapper.AddHandler(modules.Mute)
 	wrapper.AddHandler(modules.Topic.Set)
 	wrapper.AddHandler(modules.Topic.Guard)
