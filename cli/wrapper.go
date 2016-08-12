@@ -45,20 +45,6 @@ func Exec(msg interface{}, command string, args ...string) error {
 	return nil
 }
 
-func (w *Wrapper) Start2() {
-	c, err := net.Dial("unix", "/tmp/tg2.sock")
-	if err != nil {
-		panic(err)
-	}
-	defer c.Close()
-
-	_, err = c.Write([]byte("main_session\n"))
-	if err != nil {
-		panic(err)
-	}
-	reader(c)
-}
-
 func (w *Wrapper) Start() {
 	if len(w.Handlers) == 0 {
 		log.Println("No handlers enabled, nothing to do")
@@ -70,7 +56,6 @@ func (w *Wrapper) Start() {
 	w.chMsg = make(chan *Message)
 	w.Self = &Self{}
 	w.Process.Start()
-	// w.Process.Wait()
 
 	// if err := Exec(w.Self, "get_self"); err != nil {
 	// 	panic(err)
@@ -95,19 +80,6 @@ func (w *Wrapper) Start() {
 	w.Process.Wait()
 }
 
-func reader(r io.Reader) {
-	buf := make([]byte, 1024)
-	for {
-		println("reading...")
-		n, err := r.Read(buf[:])
-
-		if err != nil {
-			panic(err)
-		}
-		println("Client got:", string(buf[0:n]))
-	}
-}
-
 func (w *Wrapper) Exec(command string, args ...string) {
 	w.chInput <- buildCommand(command, args...)
 }
@@ -121,7 +93,6 @@ func (w *Wrapper) AddHandler(hanlder msgHandler) {
 
 func (w *Wrapper) Stop() {
 	w.Process.Process.Kill()
-	// w.socket.Close()
 }
 
 func (w *Wrapper) writeRoutine() {
