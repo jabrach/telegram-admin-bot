@@ -1,7 +1,7 @@
 package modules
 
 import (
-	"github.com/jabrach/telegram-admin-bot/cli-wrapper"
+	"github.com/jabrach/telegram-admin-bot/cli"
 	"log"
 	"strings"
 	"sync"
@@ -18,7 +18,7 @@ const maxPicTimeout = 30
 
 var PicUpdater = picUpdater{queues: map[int64]int64{}}
 
-func (p *picUpdater) Update(msg *cli.Message, wrapper cli.CLI) {
+func (p *picUpdater) Update(msg *cli.Message, wrapper *cli.Wrapper) {
 	if msg.Data.Event == "download" {
 		log.Println("Downloaded some pic, setting as chat photo")
 		wrapper.Exec("chat_set_photo", p.chatID, msg.Data.Result)

@@ -1,7 +1,7 @@
 package modules
 
 import (
-	"github.com/jabrach/telegram-admin-bot/cli-wrapper"
+	"github.com/jabrach/telegram-admin-bot/cli"
 )
 
 type filterFunc func(*cli.Message) bool

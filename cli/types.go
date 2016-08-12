@@ -4,7 +4,7 @@ import (
 	"github.com/jabrach/telegram-admin-bot/config"
 )
 
-type handlerFunc func(*Message, CLI)
+type msgHandler func(*Message, *Wrapper)
 
 type MessageData struct {
 	ID      string   `json:"id"`

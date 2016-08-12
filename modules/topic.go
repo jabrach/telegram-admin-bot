@@ -1,7 +1,7 @@
 package modules
 
 import (
-	"github.com/jabrach/telegram-admin-bot/cli-wrapper"
+	"github.com/jabrach/telegram-admin-bot/cli"
 	"github.com/jabrach/telegram-admin-bot/config"
 	"log"
 	"strings"
@@ -15,7 +15,7 @@ type nameGuard struct {
 
 var Topic = nameGuard{}
 
-func (n *nameGuard) Set(msg *cli.Message, wrapper cli.CLI) {
+func (n *nameGuard) Set(msg *cli.Message, wrapper *cli.Wrapper) {
 	if !filter(msg, IsMessage, FromManagedGroup) {
 		return
 	}
@@ -29,7 +29,7 @@ func (n *nameGuard) Set(msg *cli.Message, wrapper cli.CLI) {
 	n.setTopic(msg.Data.To.ID, msg.Group(), wrapper)
 }
 
-func (n *nameGuard) Guard(msg *cli.Message, wrapper cli.CLI) {
+func (n *nameGuard) Guard(msg *cli.Message, wrapper *cli.Wrapper) {
 	if !filter(msg, FromManagedGroup, IsUpdate, IsTitleUpdate) {
 		return
 	}
@@ -53,7 +53,7 @@ func (n *nameGuard) saveTopic(groupID int64, topic string) {
 	n.topics[groupID] = topic
 }
 
-func (n *nameGuard) setTopic(chatID string, group *config.Group, wrapper cli.CLI) {
+func (n *nameGuard) setTopic(chatID string, group *config.Group, wrapper *cli.Wrapper) {
 	wrapper.Exec("rename_chat", chatID, n.fullTopic(group))
 }
 

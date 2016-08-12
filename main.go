@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/jabrach/telegram-admin-bot/cli-wrapper"
+	"github.com/jabrach/telegram-admin-bot/cli"
 	"github.com/jabrach/telegram-admin-bot/config"
 	"github.com/jabrach/telegram-admin-bot/modules"
 )
@@ -31,5 +31,5 @@ func main() {
 	wrapper.AddHandler(modules.Topic.Set)
 	wrapper.AddHandler(modules.Topic.Guard)
 	wrapper.AddHandler(modules.PicUpdater.Update)
-	wrapper.Listen()
+	wrapper.Start()
 }
